@@ -2,13 +2,13 @@
 
 Scrape Redfin's homes for sale in a city, county or neighbourhood into structured JSON: price, beds, baths, square feet, lot size, year built, price per square foot, HOA, days on market, full address with ZIP and neighbourhood, latitude and longitude, MLS number, listing status (Active, Coming Soon, Pending...), property type, key facts ("Pool", "Garage"), last sale date, the listing description and the main photo. Up to 350 homes per request and thousands per region, sorted the way Redfin sorts them or by price or newest.
 
-The scraper calls Redfin's own map-search API (the JSON its website loads) through a public [Unbrowse](https://unbrowse.ai) tool. The request is sent from your machine and parsed locally, so there is no browser to run and no page layout to break.
+The scraper calls Redfin's own map-search API (the JSON its website loads) through a public [Unbrowse](https://unbrowse.ai) tool. The request is sent from your machine and parsed locally, so there is no browser to run and no page layout to break. Without an Unbrowse key, or when that tool is unavailable, the scraper sends the same request straight to the site and parses it the same way.
 
 ## Quick start
 
 ```bash
 git clone https://github.com/unbrowse-ai/redfin-scraper && cd redfin-scraper && npm install
-export UNBROWSE_API_KEY=ub_live_...        # free key: https://unbrowse.ai
+export UNBROWSE_API_KEY=ub_live_...        # optional; free key: https://unbrowse.ai
 
 node index.mjs https://www.redfin.com/city/30818/TX/Austin --max 500 > austin.json
 node index.mjs https://www.redfin.com/county/118/WA/King-County --sort price-desc --max 50 > king-top.json
@@ -78,7 +78,7 @@ const homes = await scrape("https://www.redfin.com/city/30818/TX/Austin", { max:
 
 **Sold homes and rentals?** Not yet: the public tool covers homes for sale. Contributions welcome.
 
-**Why a key?** The search is sent through Unbrowse's public Redfin tool, which tells your machine which request to send. The key is free; the request leaves from your IP.
+**Do I need a key?** No. With a free [Unbrowse](https://unbrowse.ai) key, the scraper runs Unbrowse's public Redfin tool first, which tells your machine which request to send. Without a key, or when a tool is unavailable, it sends the same request directly with a normal browser user agent (one `note:` line on stderr says so). Either way the request leaves from your IP, and your key is never sent to the site.
 
 ---
 

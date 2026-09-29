@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Redfin Scraper: homes for sale in a Redfin city, county, neighborhood or state as structured JSON.
-// Results come from Redfin's own map-search API through the public Unbrowse tool, sent from this machine.
+// Results come from Redfin's own map-search API through the public Unbrowse tool, sent from this machine;
+// without a key, or when the tool is unavailable, that API is called directly.
 import { fileURLToPath } from "node:url";
 import { cli, readPage } from "./lib/read-page.mjs";
 import { MAX_ITEMS, PAGE_SIZE, parseRegion, parseResults } from "./parse.mjs";
@@ -21,7 +22,10 @@ async function page(region, start, count, sort) {
     start: String(start),
     ord: SORTS[sort] ?? SORTS.recommended,
   };
-  const p = await readPage(CAPABILITY, input, { hosts: HOSTS, minBytes: 50 });
+  // The request the tool stands for: Redfin's map-search API (homes for sale), called directly when the tool cannot run.
+  const q = new URLSearchParams({ al: "1", include_nearby_homes: "true", market: input.market, num_homes: input.num_homes, ord: input.ord, page_number: "1", region_id: input.region_id, region_type: input.region_type, start: input.start, status: "9", uipt: "1,2,3,4,5,6,7,8", v: "8" });
+  const direct = { url: `https://www.redfin.com/stingray/api/gis?${q}`, headers: { accept: "application/json, text/plain, */*", referer: "https://www.redfin.com/" } };
+  const p = await readPage(CAPABILITY, input, { hosts: HOSTS, minBytes: 50, direct });
   const r = parseResults(p.body);
   if (!r) throw new Error(`Redfin did not return results for ${region.name}`);
   return r.homes;
@@ -80,6 +84,6 @@ Usage: node index.mjs <redfin region URL | city:<id> | county:<id>>... [options]
   --sort             recommended (default), newest, price-asc, price-desc
   --min-price N --max-price N --min-beds N --min-baths N
 
-Needs UNBROWSE_API_KEY (free at https://unbrowse.ai).`,
+Uses UNBROWSE_API_KEY when set (free at https://unbrowse.ai); without it, requests go straight to the site.`,
   );
 }

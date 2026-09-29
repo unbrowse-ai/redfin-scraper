@@ -10,7 +10,7 @@ description: Get Redfin homes for sale in a US city, county or neighborhood as J
 - For sale only (no sold or rentals). Needs a Redfin region URL (`/city/<id>/...`, `/county/<id>/...`, `/neighborhood/<id>/...`) or `city:<id>`; a bare place name is not resolved.
 
 ## Run
-Needs `UNBROWSE_API_KEY` (free at https://unbrowse.ai). From the repo root:
+Uses `UNBROWSE_API_KEY` when set (free at https://unbrowse.ai); without it, requests go straight to the site. From the repo root:
 
 ```bash
 node index.mjs https://www.redfin.com/city/30818/TX/Austin --max 500 > out.json
